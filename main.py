@@ -1,0 +1,25 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+# Libraries
+import numpy as np
+import pandas as pd
+import seaborn as sns 
+import matplotlib.pyplot as plt
+from scipy import stats
+import datetime as dt
+import requests
+from io import StringIO
+
+from SCRIPTS import data_pull as dp
+
+# Parameters
+API_TOKEN = 'e2fd256de21fbae5eaf995d3e84002bcdcecfa85'
+TICKERS = ['GLD', 'SPY', 'TSLA', 'BRK-B', 'AAPL']
+START_DATE = '2023-01-01'
+END_DATE = str(dt.date.today())
+
+# Data Retrieval
+data = dp.get_data(TICKERS, START_DATE, END_DATE, API_TOKEN)
+log_returns = np.log(data/data.shift(1))
+print(log_returns, log_returns.corr())
