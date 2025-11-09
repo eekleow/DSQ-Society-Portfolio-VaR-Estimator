@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import numpy as np
+import numpy as np 
 import pandas as pd
 import seaborn as sns 
 import matplotlib.pyplot as plt
@@ -20,12 +20,20 @@ def api_request(ticker, startDate, endDate, token):
         return None
 
 def get_data(tickers, startDate, endDate, token):
+    api_success = True
     data = pd.DataFrame()
+    backup_data_df=pd.read_csv("DATA/stockdata_backup.csv", parse_dates=['date'],usecols=['date',*tickers]).set_index('date')
     for ticker in tickers:
         temp_data = api_request(ticker, startDate, endDate, token)
         if temp_data is not None:
             temp_data.set_index('date', inplace=True)
             data[ticker] = temp_data['close']
         else:
-            print(f"Failed to retrieve data for {ticker}")
-    return data
+            api_success=False
+            break 
+    if api_success and not data.empty:
+        return data
+    else:
+        return backup_data_df
+    
+    
