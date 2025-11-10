@@ -36,4 +36,7 @@ def get_data(tickers, startDate, endDate, token):
     else:
         return backup_data_df
     
-    
+def get_weights(tickers):
+    weights_df=pd.read_csv("DATA/portfolio_raw.csv")
+    weights = weights_df.set_index('ticker').loc[tickers,'weight'].to_numpy()
+    return weights

@@ -21,5 +21,6 @@ END_DATE = str(dt.date.today())
 
 # Data Retrieval
 data = dp.get_data(TICKERS, START_DATE, END_DATE, API_TOKEN)
+weights=dp.get_weights(TICKERS)
 log_returns = np.log(data/data.shift(1))
-print(log_returns, log_returns.corr())
+print(weights)
