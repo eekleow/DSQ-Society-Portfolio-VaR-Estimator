@@ -10,6 +10,7 @@ from scipy import stats
 import datetime as dt
 import requests
 from io import StringIO
+from scipy.optimize import minimize
 
 from SCRIPTS import data_pull as dp
 
@@ -22,5 +23,17 @@ END_DATE = str(dt.date.today())
 # Data Retrieval
 data = dp.get_data(TICKERS, START_DATE, END_DATE, API_TOKEN)
 weights=dp.get_weights(TICKERS)
-log_returns = np.log(data/data.shift(1))
-print(weights)
+returns = data.pct_change().dropna()
+cov_matrix=returns.cov().to_numpy()
+
+def portfolio_variance(weights,cov_matrix):
+    return np.dot(weights.T, np.dot(cov_matrix, weights))
+
+n = len(TICKERS)
+constraints = ({'type': 'eq', 'fun': lambda w: np.sum(w) - 1})
+bounds = tuple((0, 1) for _ in range(n))
+init_guess = np.ones(n) / n
+optimise = minimize(portfolio_variance, init_guess, args=(cov_matrix),method='SLSQP', bounds=bounds, constraints=constraints)
+
+optimal_weights=optimise.x
+min_variance=optimise.fun
