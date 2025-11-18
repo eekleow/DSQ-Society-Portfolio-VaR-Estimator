@@ -33,7 +33,7 @@ n = len(TICKERS)
 constraints = ({'type': 'eq', 'fun': lambda w: np.sum(w) - 1})
 bounds = tuple((0, 1) for _ in range(n))
 init_guess = np.ones(n) / n
-optimise = minimize(portfolio_variance, init_guess, args=(cov_matrix),method='SLSQP', bounds=bounds, constraints=constraints)
+optimise = minimize(portfolio_variance, init_guess, args=(cov_matrix,),method='SLSQP', bounds=bounds, constraints=constraints)
 
 optimal_weights=optimise.x
 min_variance=optimise.fun
