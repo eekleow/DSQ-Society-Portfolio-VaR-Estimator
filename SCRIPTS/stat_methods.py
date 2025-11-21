@@ -15,4 +15,18 @@ def min_portfolio_variance(cov_matrix, n):
     optimise = minimize(portfolio_variance, init_guess, args=(cov_matrix,),method='SLSQP', bounds=bounds, constraints=constraints, options={'maxiter': 1000, 'ftol': 1e-12, 'eps': 1e-6})
     optimal_weights = optimise.x
     min_variance = optimise.fun
-    return results
+    return optimal_weights, min_variance
+
+def parametric_backtest(returns, weights):
+    portfolio_return=(returns*weights).sum(axis=1)
+    portfolio_return.name = "return"
+    portfolio_df = portfolio_return.to_frame()
+    portfolio_df['rolling_mean_2y'] = portfolio_df["return"].rolling(window=504).mean()
+    portfolio_df['rolling_std_2y'] = portfolio_df["return"].rolling(window=504).std()
+    portfolio_df['parametric_var'] = (portfolio_df['rolling_mean_2y'] - 1.645 * portfolio_df['rolling_std_2y']).shift(1)
+    portfolio_df = portfolio_df[["return", "parametric_var"]].dropna()
+    portfolio_df['in_limit'] = portfolio_df['return'] < portfolio_df['parametric_var']
+    count = portfolio_df['in_limit'].sum()
+    percent=count/len(portfolio_df)
+    ann_count = np.ceil(percent*252)
+    return percent, ann_count

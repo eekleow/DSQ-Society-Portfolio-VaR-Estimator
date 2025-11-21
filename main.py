@@ -27,15 +27,23 @@ data = dm.get_data(TICKERS, START_DATE, END_DATE, API_TOKEN)
 
 # Training and Optimisation
 data_train = data[data.index < TEST_DATE]
-weights=dm.get_weights(TICKERS)
-returns = data_train.pct_change().dropna()
-cov_matrix=returns.cov().to_numpy()
+weights_prior=dm.get_weights(TICKERS)
+returns_train = data_train.pct_change().dropna()
+cov_matrix=returns_train.cov().to_numpy()
 
-optimal_weights, min_variance = sm.min_portfolio_variance(cov_matrix, len(TICKERS))
+weights_optimal, min_variance = sm.min_portfolio_variance(cov_matrix, len(TICKERS))
 portfolio_optimised = pd.DataFrame({
     'ticker': TICKERS,
-    'weight': optimal_weights
+    'weight': weights_optimal.round(4)
 })
 portfolio_optimised.to_csv("DATA/portfolio_optimised.csv", index=False)
 
 # Backtesting
+returns = data.pct_change().dropna()
+raw_exception_pct, raw_exception_ann_count = sm.parametric_backtest(returns, weights_prior)
+opt_exception_pct, opt_exception_ann_count = sm.parametric_backtest(returns, weights_optimal)
+backtest_metrics = pd.DataFrame({
+    'Metric': ['Raw Portfolio Exception %', 'Raw Portfolio Annual Exception Count', 'Optimised Portfolio Exception %', 'Optimised Portfolio Annual Exception Count'],
+    'Value': [round(raw_exception_pct,4)*100, raw_exception_ann_count, round(opt_exception_pct,4)*100, opt_exception_ann_count]
+})
+backtest_metrics.to_csv("DATA/backtest_metrics.csv", index=False)
