@@ -39,11 +39,33 @@ portfolio_optimised = pd.DataFrame({
 portfolio_optimised.to_csv("DATA/portfolio_optimised.csv", index=False)
 
 # Backtesting
+data_test = data[data.index >= TEST_DATE]
+returns_test = data_test.pct_change().dropna()
+raw_historical_var, raw_parametric_var = sm.calculate_var(returns_test.dot(weights_prior), confidence=0.95)
+opt_historical_var, opt_parametric_var = sm.calculate_var(returns_test.dot(weights_optimal), confidence=0.95)
+
 returns = data.pct_change().dropna()
 raw_exception_pct, raw_exception_ann_count = sm.parametric_backtest(returns, weights_prior)
 opt_exception_pct, opt_exception_ann_count = sm.parametric_backtest(returns, weights_optimal)
+
 backtest_metrics = pd.DataFrame({
-    'Metric': ['Raw Portfolio Exception %', 'Raw Portfolio Annual Exception Count', 'Optimised Portfolio Exception %', 'Optimised Portfolio Annual Exception Count'],
-    'Value': [round(raw_exception_pct,4)*100, raw_exception_ann_count, round(opt_exception_pct,4)*100, opt_exception_ann_count]
+    'Metric': ['Raw Portfolio Historical VaR %',
+               'Raw Portfolio Parametric VaR %',
+               'Raw Portfolio Exception %', 
+               'Raw Portfolio Annual Exception Count', 
+               'Optimised Portfolio Historical VaR %',
+               'Optimised Portfolio Parametric VaR %',
+               'Optimised Portfolio Exception %', 
+               'Optimised Portfolio Annual Exception Count'
+               ],
+    'Value': [round(raw_historical_var,4)*100,
+              round(raw_parametric_var,4)*100,
+              round(raw_exception_pct,4)*100, 
+              raw_exception_ann_count,
+              round(opt_historical_var,4)*100,
+              round(opt_parametric_var,4)*100,
+              round(opt_exception_pct,4)*100, 
+              opt_exception_ann_count
+              ]
 })
 backtest_metrics.to_csv("DATA/backtest_metrics.csv", index=False)
