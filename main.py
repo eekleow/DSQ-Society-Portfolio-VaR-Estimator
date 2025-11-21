@@ -10,24 +10,40 @@ from scipy import stats
 import datetime as dt
 import requests
 from io import StringIO
+from scipy.optimize import minimize
 
-from SCRIPTS import data_pull as dp
-from SCRIPTS import var_calculations as vc
+from SCRIPTS import data_methods as dm
+from SCRIPTS import stat_methods as sm
 
 # Parameters
 API_TOKEN = 'e2fd256de21fbae5eaf995d3e84002bcdcecfa85'
 TICKERS = ['GLD', 'SPY', 'TSLA', 'BRK-B', 'AAPL']
 START_DATE = '2023-01-01'
 END_DATE = str(dt.date.today())
+TEST_DATE = '2025-01-01'
 
 # Data Retrieval
-data = dp.get_data(TICKERS, START_DATE, END_DATE, API_TOKEN)
-weights=dp.get_weights(TICKERS)
-log_returns = np.log(data/data.shift(1))
-print(weights)
-portfolio_returns = (returns * weights).sum(axis=1).dropna()
+data = dm.get_data(TICKERS, START_DATE, END_DATE, API_TOKEN)
 
-# VaR Calculations
-historical_var, parametric_var = vc.calculate_var(portfolio_returns)
-print(f"Historical VaR (95%): {historical_var}")
-print(f"Parametric VaR (95%): {parametric_var}")
+# Training and Optimisation
+data_train = data[data.index < TEST_DATE]
+weights_prior=dm.get_weights(TICKERS)
+returns_train = data_train.pct_change().dropna()
+cov_matrix=returns_train.cov().to_numpy()
+
+weights_optimal, min_variance = sm.min_portfolio_variance(cov_matrix, len(TICKERS))
+portfolio_optimised = pd.DataFrame({
+    'ticker': TICKERS,
+    'weight': weights_optimal.round(4)
+})
+portfolio_optimised.to_csv("DATA/portfolio_optimised.csv", index=False)
+
+# Backtesting
+returns = data.pct_change().dropna()
+raw_exception_pct, raw_exception_ann_count = sm.parametric_backtest(returns, weights_prior)
+opt_exception_pct, opt_exception_ann_count = sm.parametric_backtest(returns, weights_optimal)
+backtest_metrics = pd.DataFrame({
+    'Metric': ['Raw Portfolio Exception %', 'Raw Portfolio Annual Exception Count', 'Optimised Portfolio Exception %', 'Optimised Portfolio Annual Exception Count'],
+    'Value': [round(raw_exception_pct,4)*100, raw_exception_ann_count, round(opt_exception_pct,4)*100, opt_exception_ann_count]
+})
+backtest_metrics.to_csv("DATA/backtest_metrics.csv", index=False)
