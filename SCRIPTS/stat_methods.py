@@ -35,21 +35,39 @@ def parametric_backtest(returns, weights):
     ann_count = np.ceil(percent*252)
     return percent, ann_count
 
+def classify_zone(x):
+    if 0 <= x <= 4:
+        return "Green Zone"
+    elif 5 <= x <= 9:
+        return "Yellow Zone"
+    elif x >= 10:
+        return "Red Zone"
+    else:
+        return ""
+
 def varplots(returns,weights, weight_type, img_path,tickers):
     portfolio_returns = (returns * weights).sum(axis=1)
     mean = portfolio_returns.mean()
     std = portfolio_returns.std()
-    portfolio_var = mean - 1.645 * std
+    portfolio_parametric_var = mean - 1.645 * std
+    portfolio_historic_var = np.percentile(portfolio_returns, 5)
     x = np.linspace(portfolio_returns.min(), portfolio_returns.max(), 1000)
     pdf = norm.pdf(x, mean, std)
     fig, ax = plt.subplots(figsize=(12, 6))
     sns.histplot(portfolio_returns, bins=100, stat='density',label="Non-parametric Returns", ax=ax)
-    ax.plot(x, pdf, linewidth=2, color='green', label='Parametric Returns')
-    ax.axvline(portfolio_var, color='r', linestyle='dashed')
+    ax.plot(x, pdf, linewidth=2, color='black', label='Parametric Returns')
+    ax.axvline(portfolio_parametric_var, color='r', linestyle='dashed')
+    ax.axvline(portfolio_historic_var, color='g', linestyle='dashed')
     ax.text(
-        portfolio_var, ax.get_ylim()[1]*0.8,
-        f"5% VaR = {portfolio_var:.5f}",
+        portfolio_parametric_var, ax.get_ylim()[1]*0.8,
+        f"5% Parametric VaR = {portfolio_parametric_var:.5f}",
         color='r', ha='right', fontsize=10,
+        bbox=dict(facecolor='white', edgecolor='none', alpha=0.7)
+    )
+    ax.text(
+        portfolio_historic_var, ax.get_ylim()[1]*0.8,
+        f"5% Historic VaR = {portfolio_historic_var:.5f}",
+        color='g', ha='left', fontsize=10,
         bbox=dict(facecolor='white', edgecolor='none', alpha=0.7)
     )
     ax.text(
@@ -61,7 +79,7 @@ def varplots(returns,weights, weight_type, img_path,tickers):
         bbox=dict(facecolor='white', alpha=0.7, edgecolor='none')
     )
     ax.set_xlabel("Portfolio Return") 
-    ax.set_title(f'Parametric and Non-parametric returns of '+ f', '.join(tickers) + f' using {weight_type} weights',wrap=True, pad=15)
+    ax.set_title(f'Parametric and Non-parametric YTD returns of '+ f', '.join(tickers) + f' using {weight_type} weights',wrap=True, pad=15)
     ax.legend()
     fig.tight_layout()
     fig.savefig(img_path)

@@ -48,24 +48,31 @@ returns = data.pct_change().dropna()
 raw_exception_pct, raw_exception_ann_count = sm.parametric_backtest(returns, weights_prior)
 opt_exception_pct, opt_exception_ann_count = sm.parametric_backtest(returns, weights_optimal)
 
+raw_zone = sm.classify_zone(raw_exception_ann_count)
+opt_zone = sm.classify_zone(opt_exception_ann_count)
+
 backtest_metrics = pd.DataFrame({
     'Metric': ['Raw Portfolio Historical VaR %',
                'Raw Portfolio Parametric VaR %',
                'Raw Portfolio Exception %', 
-               'Raw Portfolio Annual Exception Count', 
+               'Raw Portfolio Annual Exception Count',
+               'Raw Portfolio Model Zone', 
                'Optimised Portfolio Historical VaR %',
                'Optimised Portfolio Parametric VaR %',
                'Optimised Portfolio Exception %', 
-               'Optimised Portfolio Annual Exception Count'
+               'Optimised Portfolio Annual Exception Count',
+               'Optimised Portfolio Model Zone'
                ],
     'Value': [round(raw_historical_var,4)*100,
               round(raw_parametric_var,4)*100,
               round(raw_exception_pct,4)*100, 
               raw_exception_ann_count,
+              raw_zone,
               round(opt_historical_var,4)*100,
               round(opt_parametric_var,4)*100,
               round(opt_exception_pct,4)*100, 
-              opt_exception_ann_count
+              opt_exception_ann_count,
+              opt_zone
               ]
 })
 backtest_metrics.to_csv("DATA/backtest_metrics.csv", index=False)
@@ -73,5 +80,5 @@ backtest_metrics.to_csv("DATA/backtest_metrics.csv", index=False)
 #Plotting 
 raw_img_path = "DATA/portfolio_raw_plot.png"
 opt_img_path = "DATA/portfolio_optimised_plot.png"
-raw_portfolio_plot = sm.varplots(returns_train,weights_prior, "raw",raw_img_path,TICKERS)
-optimised_portfolio_plot = sm.varplots(returns_train,weights_optimal,"optimised",opt_img_path,TICKERS)
+raw_portfolio_plot = sm.varplots(returns_test,weights_prior, "raw",raw_img_path,TICKERS)
+optimised_portfolio_plot = sm.varplots(returns_test,weights_optimal,"optimised",opt_img_path,TICKERS)
