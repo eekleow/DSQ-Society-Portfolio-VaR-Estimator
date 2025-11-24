@@ -47,3 +47,9 @@ backtest_metrics = pd.DataFrame({
     'Value': [round(raw_exception_pct,4)*100, raw_exception_ann_count, round(opt_exception_pct,4)*100, opt_exception_ann_count]
 })
 backtest_metrics.to_csv("DATA/backtest_metrics.csv", index=False)
+
+#Plotting 
+raw_img_path = "DATA/portfolio_raw_plot.png"
+opt_img_path = "DATA/portfolio_optimised_plot.png"
+raw_portfolio_plot = sm.varplots(returns_train,weights_prior, "raw",raw_img_path,TICKERS)
+optimised_portfolio_plot = sm.varplots(returns_train,weights_optimal,"optimised",opt_img_path,TICKERS)
