@@ -78,7 +78,17 @@ def varplots(returns,weights, weight_type, img_path,tickers):
         fontsize=10,
         bbox=dict(facecolor='white', alpha=0.7, edgecolor='none')
     )
-    ax.set_xlabel("Portfolio Return") 
+    df_weights = pd.DataFrame({"Ticker": tickers,"Weight": np.array(weights).round(2)})
+    weights_text = df_weights.to_string(index=False)
+    ax.text(
+        0.98, 0.60,
+        weights_text,
+        transform=ax.transAxes,      
+        ha='right', va='top',
+        fontsize=10,
+        bbox=dict(facecolor='white', alpha=0.7, edgecolor='none')
+    )
+    ax.set_xlabel("Portfolio Percentage Return") 
     ax.set_title(f'Parametric and Non-parametric YTD returns of '+ f', '.join(tickers) + f' using {weight_type} weights',wrap=True, pad=15)
     ax.legend()
     fig.tight_layout()
