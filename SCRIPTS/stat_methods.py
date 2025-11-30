@@ -46,11 +46,14 @@ def t_backtest(returns, weights):
     def fit_loc(x):
         nu, loc, scale = t.fit(x)
         return loc
-    portfolio_df['rolling_std'] = portfolio_df['return'].rolling(window=504).std()
+    def fit_scale(x):
+        nu, loc, scale = t.fit(x)
+        return scale
     portfolio_df['nu']    =  portfolio_df['return'].rolling(window=504).apply(fit_nu, raw=False)
     portfolio_df['loc']   =  portfolio_df['return'].rolling(window=504).apply(fit_loc, raw=False)
+    portfolio_df['scale'] = portfolio_df['return'].rolling(window=504).apply(fit_scale, raw=False)
     t_quantile = t.ppf(0.05,  portfolio_df['nu'])
-    portfolio_df['t_var'] = (portfolio_df['loc'] + t_quantile * portfolio_df['rolling_std']).shift(1)
+    portfolio_df['t_var'] = (portfolio_df['loc'] + t_quantile * portfolio_df['scale']).shift(1)
     portfolio_df = portfolio_df[["return","t_var"]].dropna(subset=['t_var'])
     portfolio_df['in limit'] = portfolio_df['return'] < portfolio_df['t_var']
     count = portfolio_df['in limit'].sum()   
@@ -75,10 +78,10 @@ def varplots(returns,weights, weight_type, img_path,tickers):
     nu, loc, scale = t.fit(portfolio_returns)
     portfolio_parametric_var = mean - 1.645 * std
     portfolio_historic_var = np.percentile(portfolio_returns, 5)
-    portfolio_t_var = loc + t.ppf(0.05,nu)*std
+    portfolio_t_var = loc + t.ppf(0.05,nu)*scale
     x = np.linspace(portfolio_returns.min(), portfolio_returns.max(), 1000)
     pdf = norm.pdf(x, mean, std)
-    t_pdf = t.pdf(x, df=nu, loc=loc, scale=std)
+    t_pdf = t.pdf(x, df=nu, loc=loc, scale=scale)
     fig, ax = plt.subplots(figsize=(12, 6))
     sns.histplot(portfolio_returns, bins=100, stat='density',label="Non-parametric Returns", ax=ax)
     ax.plot(x, pdf, linewidth=2, color='black', label='Parametric Returns')
