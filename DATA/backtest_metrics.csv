@@ -1,19 +1,19 @@
 Metric,Value
-Raw Portfolio Historical VaR %,-1.87
-Raw Portfolio Parametric VaR %,-2.31
-Raw Portfollio T-Distribution VaR %,-3.16
-Raw Portfolio Exception % under Parametric Distribution,6.22
-Raw Portfolio Annual Exception Count under Parametric Distribution,16.0
+Raw Portfolio Historical VaR %,-1.83
+Raw Portfolio Parametric VaR %,-2.19
+Raw Portfollio T-Distribution VaR %,-1.81
+Raw Portfolio Exception % under Parametric Distribution,5.38
+Raw Portfolio Annual Exception Count under Parametric Distribution,14.0
 Raw Portfolio Zone under Parametric Distribution,Red Zone
-Raw Portfolio Exception % under T-Distribution,7.5600000000000005
-Raw Portfolio Annual Exception Count under T-Distribution,20.0
+Raw Portfolio Exception % under T-Distribution,6.54
+Raw Portfolio Annual Exception Count under T-Distribution,17.0
 Raw Portfolio Zone under T-Distribution,Red Zone
-Optimised Portfolio Historical VaR %,-0.8500000000000001
-Optimised Portfolio Parametric VaR %,-1.24
-Optimised Portfollio T-Distribution VaR %,-1.67
-Optimised Portfolio Exception %,4.0
-Optimised Portfolio Annual Exception Count,11.0
+Optimised Portfolio Historical VaR %,-0.84
+Optimised Portfolio Parametric VaR %,-1.2
+Optimised Portfollio T-Distribution VaR %,-0.97
+Optimised Portfolio Exception %,3.85
+Optimised Portfolio Annual Exception Count,10.0
 Optimised Portfolio Model Zone,Red Zone
-Optimised Portfolio Exception % under T-Distribution,5.33
-Optimised Portfolio Annual Exception Count under T-Distribution,14.0
+Optimised Portfolio Exception % under T-Distribution,5.0
+Optimised Portfolio Annual Exception Count under T-Distribution,13.0
 Optimised Portfolio Zone under T-Distribution,Red Zone

@@ -22,7 +22,7 @@ def api_request(ticker, startDate, endDate, token):
 def get_data(tickers, startDate, endDate, token):
     api_success = True
     data = pd.DataFrame()
-    backup_data_df=pd.read_csv("DATA/stockdata_backup.csv", parse_dates=['date'],usecols=['date',*tickers]).set_index('date')
+    backup_data_df = pd.read_csv("DATA/stockdata_backup.csv", parse_dates=['date']).set_index('date')
     for ticker in tickers:
         temp_data = api_request(ticker, startDate, endDate, token)
         if temp_data is not None:

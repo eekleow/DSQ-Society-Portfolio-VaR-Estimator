@@ -138,5 +138,5 @@ def calculate_var(returns, confidence=0.95):
     std = returns.std()
     parametric_var = mean - 1.645 * std
     nu, loc, scale=t.fit(returns)
-    t_var=loc + t.ppf(0.05, nu )* std
+    t_var=loc + t.ppf(0.05, nu )* scale
     return historical_var, parametric_var, t_var

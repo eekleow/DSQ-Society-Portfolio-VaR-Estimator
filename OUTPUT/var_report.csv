@@ -1,0 +1,5 @@
+Model,Portfolio,Exception %,Annual exceptions,Zone
+Parametric,Raw,0.028225806451612902,8.0,Yellow Zone
+T-dist,Raw,0.06854838709677419,18.0,Red Zone
+Parametric,Optimised,0.056451612903225805,15.0,Red Zone
+T-dist,Optimised,0.06048387096774194,16.0,Red Zone
