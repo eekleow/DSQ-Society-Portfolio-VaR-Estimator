@@ -14,6 +14,7 @@ from scipy.optimize import minimize
 
 from SCRIPTS import data_methods as dm
 from SCRIPTS import stat_methods as sm
+from SCRIPTS import mc_methods as mm
 
 # Parameters
 API_TOKEN = 'e2fd256de21fbae5eaf995d3e84002bcdcecfa85'
@@ -36,6 +37,17 @@ portfolio_optimised = pd.DataFrame({
     'ticker': TICKERS,
     'weight': weights_optimal.round(4)
 })
+
+#MC methods
+returns_train = returns_train.mean()
+mcN_asset_sims = mm.mcNormal(returns_train,cov_matrix,1000)
+return_p = (mcN_asset_sims*weights_prior).sum(axis=1)
+mcVaR=np.percentile(mcN_asset_sims, 5)
+sns.histplot(return_p,bins=100)
+print(mcVaR)
+plt.show()
+
+'''
 portfolio_optimised.to_csv("DATA/portfolio_optimised.csv", index=False)
 
 # Backtesting
@@ -102,3 +114,4 @@ raw_img_path = "DATA/portfolio_raw_plot.png"
 opt_img_path = "DATA/portfolio_optimised_plot.png"
 raw_portfolio_plot = sm.varplots(returns_test,weights_prior, "raw",raw_img_path,TICKERS)
 optimised_portfolio_plot = sm.varplots(returns_test,weights_optimal,"optimised",opt_img_path,TICKERS)
+'''
